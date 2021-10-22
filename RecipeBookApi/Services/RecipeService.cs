@@ -179,6 +179,15 @@ namespace RecipeBookApi.Services
             try
             {
                 var toBeDeleted = await _context.Recipes.FindAsync(recipeId);
+
+                if(toBeDeleted.RecipeIngredients != null)
+                {
+                    var listIngredientId = toBeDeleted.RecipeIngredients.Select(ri => ri.IngredientId).ToList();
+                    var ingredientsToDelete = _context.Ingredients.Where(i => listIngredientId.Contains(i.IngredientId)).ToList();
+                    _context.Ingredients.RemoveRange(ingredientsToDelete);
+
+                }
+
                 recipeDto = DtoHelper.ConvertRecipeToDto(_context.Recipes.Remove(toBeDeleted).Entity);
                 _context.SaveChanges();
             }
